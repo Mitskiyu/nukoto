@@ -59,7 +59,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 func NewServer() *http.Server {
     mux := http.NewServeMux()
-    mux.Handle("/", Web())
+    mux.Handle("/", web())
     mux.HandleFunc("/api/upload", uploadHandler)
 
     return &http.Server{
