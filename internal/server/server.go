@@ -36,6 +36,7 @@ func processUpload(w http.ResponseWriter, r *http.Request) ([]*multipart.FileHea
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+        return
     }
 
     fileHeaders, err := processUpload(w, r)
@@ -45,8 +46,15 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    images, formats, err := processImage(fileHeaders)
+    if err != nil {
+        log.Println(err.Error())
+        http.Error(w, "Unable to process images", http.StatusBadRequest)
+        return
+    }
+
     w.WriteHeader(http.StatusOK)
-    log.Println(len(fileHeaders))
+    log.Println(len(images), formats)
 }
 
 func NewServer() *http.Server {
