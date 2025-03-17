@@ -1,13 +1,17 @@
 import { useCallback } from "react";
 import { useDropzone, FileRejection } from "react-dropzone";
+import { useImageStore } from "../lib/image-store";
 import nukoPeek from "../assets/images/nukoPeek.gif";
 
 function Upload() {
+	const addImages = useImageStore((state) => state.addImages);
+
 	const onDrop = useCallback(
 		(acceptedFiles: File[], fileRejections: FileRejection[]) => {
-			acceptedFiles.forEach((file: File) => {
+			if (acceptedFiles.length > 0) {
+				addImages(acceptedFiles);
 				// TODO
-			});
+			}
 
 			if (fileRejections.length > 0) {
 				// TODO
