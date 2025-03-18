@@ -1,9 +1,15 @@
-export async function handleUpload(files: File[]) {
+import { useImageStore } from "./image-store";
+
+export async function handleUpload() {
+	const images = useImageStore.getState().images;
+	const settings = useImageStore.getState().settings;
 	const formData = new FormData();
 
-	files.forEach((file) => {
-		formData.append("images", file);
+	images.forEach((image) => {
+		formData.append("images", image.file);
+		formData.append("image-id", image.id);
 	});
+	formData.append("settings", JSON.stringify(settings));
 
 	try {
 		const res = await fetch("/api/upload", {
