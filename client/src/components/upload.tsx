@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useDropzone, FileRejection } from "react-dropzone";
 import { useImageStore } from "../lib/image-store";
+import { handleUpload } from "../lib/handle-upload";
 import nukoPeek from "../assets/images/nukoPeek.gif";
 
 function Upload() {
@@ -10,6 +11,7 @@ function Upload() {
 		(acceptedFiles: File[], fileRejections: FileRejection[]) => {
 			if (acceptedFiles.length > 0) {
 				addImages(acceptedFiles);
+				handleUpload();
 				// TODO
 			}
 
