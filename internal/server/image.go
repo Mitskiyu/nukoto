@@ -5,20 +5,21 @@ import (
 	"fmt"
 	"image"
 	"mime/multipart"
+	"strings"
 
-	_ "image/jpeg"
-	_ "image/png"
-	_ "github.com/gen2brain/avif"
-	_ "github.com/gen2brain/webp"
+	"image/jpeg"
+	"image/png"
+	"github.com/gen2brain/avif"
+	"github.com/gen2brain/webp"
 )
 
 type ImageData struct {
-	ID              string        `json:"-"`
-	Image           image.Image   `json:"-"`
-	OriginalFormat  string        `json:"originalFormat,omitempty"`
-	ConvertedFormat string        `json:"convertedFormat,omitempty"`
-	Buffer          *bytes.Buffer `json:"-"`
-	Error           string        `json:"error,omitempty"`
+	ID              string
+	Image           image.Image
+	Buffer          *bytes.Buffer
+	OriginalFormat  string
+	ConvertedFormat string
+	Error           string
 }
 
 func processImage(fileHeaders []*multipart.FileHeader, ids []string) []ImageData {
@@ -47,6 +48,45 @@ func processImage(fileHeaders []*multipart.FileHeader, ids []string) []ImageData
             data.Image = img
             data.OriginalFormat = format
             imagesData = append(imagesData, data)
+    }
+
+    return imagesData
+}
+
+func convertImage(imagesData []ImageData, settings Settings) []ImageData {
+    for i := range imagesData {
+        if imagesData[i].Error != "" {
+            continue
+        }
+
+        imagesData[i].Buffer = new(bytes.Buffer)
+
+        var err error
+        switch strings.ToLower(settings.Format){
+        case "png":
+            err = png.Encode(imagesData[i].Buffer, imagesData[i].Image)
+        case "jpg", "jpeg":
+            err = jpeg.Encode(imagesData[i].Buffer, imagesData[i].Image, &jpeg.Options{
+                Quality: settings.Quality,
+            })
+        case "webp":
+            err = webp.Encode(imagesData[i].Buffer, imagesData[i].Image, webp.Options{
+                Lossless: settings.Quality >= 100,
+                Quality: settings.Quality,
+            })
+        case "avif":
+            err = avif.Encode(imagesData[i].Buffer, imagesData[i].Image, avif.Options{
+                Quality: settings.Quality,
+            })
+        default:
+            err = fmt.Errorf("Image format is not supported: %v", settings.Format)
+        }
+
+        if err != nil {
+            imagesData[i].Error = fmt.Sprintf("Could not convert image: %v", err)
+        } else {
+            imagesData[i].ConvertedFormat = settings.Format
+        }
     }
 
     return imagesData

@@ -76,8 +76,12 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
         }
     }
 
+    imagesData = convertImage(imagesData, settings)
+
     w.WriteHeader(http.StatusOK)
-    log.Println(imagesData, settings)
+    for _, imageData := range imagesData {
+        log.Println(imageData.OriginalFormat, imageData.ConvertedFormat, settings, imageData.Error)
+    }
 }
 
 func NewServer() *http.Server {
