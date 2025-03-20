@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -11,6 +12,14 @@ import (
 type Settings struct {
     Format  string `json:"format"`
     Quality int    `json:"quality"`
+}
+
+type ImageResponse struct {
+    ID              string `json:"id"`
+    OriginalFormat  string `json:"originalFormat"`
+    ConvertedFormat string `json:"convertedFormat"`
+    Data            string `json:"data"`
+    Error           bool   `json:"error"`
 }
 
 const (
@@ -54,7 +63,32 @@ func processUpload(w http.ResponseWriter, r *http.Request) ([]*multipart.FileHea
     return fileHeaders, ids, settings, nil
 }
 
+func processResponse(imagesData []ImageData) []ImageResponse {
+    imagesResponse := make([]ImageResponse, 0, len(imagesData))
+    var res ImageResponse
+
+    for _, imageData := range imagesData {
+        res = ImageResponse {
+            ID: imageData.ID,
+            OriginalFormat: imageData.OriginalFormat,
+            ConvertedFormat: imageData.ConvertedFormat,
+            Error: imageData.Error != "",
+        }
+
+        if imageData.Buffer != nil && res.Error == false {
+            res.Data = base64.StdEncoding.EncodeToString(imageData.Buffer.Bytes())
+        }
+
+        imagesResponse = append(imagesResponse, res)
+
+    }
+    return imagesResponse
+
+}
+
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
         return
@@ -67,20 +101,35 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    var imageErrors int
     imagesData := processImage(fileHeaders, ids)
+
+    imagesData = convertImage(imagesData, settings)
     for _, imageData := range imagesData {
         if imageData.Error != "" {
-            log.Println(imageData.Error)
-            http.Error(w, "Unable to process images", http.StatusBadRequest)
-            return
+            imageErrors++
         }
     }
 
-    imagesData = convertImage(imagesData, settings)
+    if imageErrors == len(fileHeaders) {
+        http.Error(w, "Could not process images", http.StatusBadRequest)
+        return
+    }
 
-    w.WriteHeader(http.StatusOK)
-    for _, imageData := range imagesData {
-        log.Println(imageData.OriginalFormat, imageData.ConvertedFormat, settings, imageData.Error)
+    imagesResponse := processResponse(imagesData)
+
+    if imageErrors != 0 {
+        for _, imageData := range imagesData {
+            log.Printf("Could not process all images: %v", imageData.Error)
+        }
+        w.WriteHeader(http.StatusPartialContent)
+    } else {
+        w.WriteHeader(http.StatusOK)
+    }
+
+    if err := json.NewEncoder(w).Encode(imagesResponse); err != nil {
+        log.Printf("Could not encode response: %v", err)
+        http.Error(w, "Unable to encode response", http.StatusInternalServerError)
     }
 }
 
