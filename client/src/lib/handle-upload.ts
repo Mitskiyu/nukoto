@@ -1,3 +1,4 @@
+import { handleConvert } from "./handle-convert";
 import { useImageStore } from "./image-store";
 
 export async function handleUpload() {
@@ -6,8 +7,14 @@ export async function handleUpload() {
 	const formData = new FormData();
 
 	images.forEach((image) => {
+		if (image.status == "done") {
+			return;
+		}
+
 		formData.append("images", image.file);
 		formData.append("image-id", image.id);
+
+		useImageStore.getState().updateStatus(image.id, "converting", {});
 	});
 	formData.append("settings", JSON.stringify(settings));
 
@@ -18,10 +25,27 @@ export async function handleUpload() {
 		});
 
 		if (!res.ok) {
-			throw new Error("Failed to upload");
+			const error = await res.text();
+			throw new Error(error);
 		}
 
-		console.log("Success");
+		const convertedImages = await res.json();
+		convertedImages.forEach(
+			(img: {
+				id: string;
+				originalFormat: string;
+				convertedFormat: string;
+				data: string;
+				error: boolean;
+			}) => {
+				if (img.error) {
+					useImageStore.getState().updateStatus(img.id, "error", {});
+					return;
+				}
+
+				handleConvert(img);
+			},
+		);
 	} catch (err) {
 		console.error(err);
 	}
