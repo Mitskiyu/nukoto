@@ -15,6 +15,7 @@ type Image = {
 	status: Status;
 	previewURL: string;
 	convertedURL?: string;
+	convertedFormat?: string;
 	error?: string;
 };
 
