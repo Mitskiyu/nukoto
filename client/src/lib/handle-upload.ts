@@ -1,5 +1,6 @@
 import { handleConvert } from "./handle-convert";
 import { useImageStore } from "./image-store";
+import { toast } from "sonner";
 
 export async function handleUpload() {
 	const images = useImageStore.getState().images;
@@ -23,6 +24,16 @@ export async function handleUpload() {
 			method: "POST",
 			body: formData,
 		});
+
+		if (res.status === 429) {
+			toast.error("Rate limit exceeded. Please try again later.");
+			images.forEach((image) => {
+				if (image.status === "converting") {
+					useImageStore.getState().updateStatus(image.id, "pending", {});
+				}
+			});
+			return;
+		}
 
 		if (!res.ok) {
 			const error = await res.text();
@@ -48,5 +59,11 @@ export async function handleUpload() {
 		);
 	} catch (err) {
 		console.error(err);
+		toast.error("Failed to convert images. Please try again.");
+		images.forEach((image) => {
+			if (image.status === "converting") {
+				useImageStore.getState().updateStatus(image.id, "pending", {});
+			}
+		});
 	}
 }
