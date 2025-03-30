@@ -6,9 +6,11 @@ import (
 	"image"
 	"mime/multipart"
 	"strings"
+	"sync"
 
 	"image/jpeg"
 	"image/png"
+
 	"github.com/gen2brain/avif"
 	"github.com/gen2brain/webp"
 )
@@ -23,71 +25,97 @@ type ImageData struct {
 }
 
 func processImage(fileHeaders []*multipart.FileHeader, ids []string) []ImageData {
-    imagesData := make([]ImageData, 0, len(fileHeaders))
+	imagesData := make([]ImageData, len(fileHeaders))
 
-    for i, fh := range fileHeaders {
-            data := ImageData {
-                ID: ids[i],
-            }
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, 2)
 
-            file, err := fh.Open()
-            if err != nil {
-                data.Error = fmt.Sprintf("Could not open file: %v", err)
-                imagesData = append(imagesData, data)
-                continue
-            }
+	for i := range fileHeaders {
+		wg.Add(1)
 
-            img, format, err := image.Decode(file)
-            file.Close()
-            if err != nil {
-                data.Error = fmt.Sprintf("Could not decode image: %v", err)
-                imagesData = append(imagesData, data)
-                continue
-            }
+		go func(i int) {
+			defer wg.Done()
 
-            data.Image = img
-            data.OriginalFormat = format
-            imagesData = append(imagesData, data)
-    }
+			semaphore <- struct{}{}
+			defer func() { <-semaphore }()
 
-    return imagesData
+			data := ImageData{
+				ID: ids[i],
+			}
+
+			file, err := fileHeaders[i].Open()
+			if err != nil {
+				data.Error = fmt.Sprintf("Could not open file: %v", err)
+				imagesData[i] = data
+				return
+			}
+			defer file.Close()
+			img, format, err := image.Decode(file)
+			if err != nil {
+				data.Error = fmt.Sprintf("Could not decode image: %v", err)
+				imagesData[i] = data
+				return
+			}
+
+			data.Image = img
+			data.OriginalFormat = format
+			imagesData[i] = data
+		}(i)
+	}
+
+	wg.Wait()
+	return imagesData
 }
 
 func convertImage(imagesData []ImageData, settings Settings) []ImageData {
-    for i := range imagesData {
-        if imagesData[i].Error != "" {
-            continue
-        }
+	var wg sync.WaitGroup
+	semaphore := make(chan struct{}, 2)
 
-        imagesData[i].Buffer = new(bytes.Buffer)
+	for i := range imagesData {
+		if imagesData[i].Error != "" {
+			continue
+		}
 
-        var err error
-        switch strings.ToLower(settings.Format){
-        case "png":
-            err = png.Encode(imagesData[i].Buffer, imagesData[i].Image)
-        case "jpg", "jpeg":
-            err = jpeg.Encode(imagesData[i].Buffer, imagesData[i].Image, &jpeg.Options{
-                Quality: settings.Quality,
-            })
-        case "webp":
-            err = webp.Encode(imagesData[i].Buffer, imagesData[i].Image, webp.Options{
-                Lossless: settings.Quality >= 100,
-                Quality: settings.Quality,
-            })
-        case "avif":
-            err = avif.Encode(imagesData[i].Buffer, imagesData[i].Image, avif.Options{
-                Quality: settings.Quality,
-            })
-        default:
-            err = fmt.Errorf("Image format is not supported: %v", settings.Format)
-        }
+		wg.Add(1)
 
-        if err != nil {
-            imagesData[i].Error = fmt.Sprintf("Could not convert image: %v", err)
-        } else {
-            imagesData[i].ConvertedFormat = settings.Format
-        }
-    }
+		go func(i int) {
+			defer wg.Done()
 
-    return imagesData
+			semaphore <- struct{}{}
+			defer func() { <-semaphore }()
+
+			imagesData[i].Buffer = new(bytes.Buffer)
+
+			var err error
+			switch strings.ToLower(settings.Format) {
+			case "png":
+				err = png.Encode(imagesData[i].Buffer, imagesData[i].Image)
+			case "jpg", "jpeg":
+				err = jpeg.Encode(imagesData[i].Buffer, imagesData[i].Image, &jpeg.Options{
+					Quality: settings.Quality,
+				})
+			case "webp":
+				err = webp.Encode(imagesData[i].Buffer, imagesData[i].Image, webp.Options{
+					Lossless: settings.Quality >= 100,
+					Quality:  settings.Quality,
+				})
+			case "avif":
+				err = avif.Encode(imagesData[i].Buffer, imagesData[i].Image, avif.Options{
+					Quality: settings.Quality,
+				})
+			default:
+				err = fmt.Errorf("Image format is not supported: %v", settings.Format)
+			}
+
+			if err != nil {
+				imagesData[i].Error = fmt.Sprintf("Could not convert image: %v", err)
+			} else {
+				imagesData[i].ConvertedFormat = settings.Format
+			}
+		}(i)
+
+	}
+
+	wg.Wait()
+	return imagesData
 }
