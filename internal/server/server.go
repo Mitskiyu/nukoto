@@ -7,6 +7,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -189,8 +190,13 @@ func NewServer() *http.Server {
 	mux.Handle("/", web())
 	mux.HandleFunc("/api/upload", uploadHandler)
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	return &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: mux,
 	}
 }

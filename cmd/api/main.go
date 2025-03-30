@@ -13,26 +13,26 @@ import (
 )
 
 func main() {
-    server := server.NewServer()
+	server := server.NewServer()
 
-    go func() {
-        log.Println("Nukoto server starting on port 8080...")
-        err := server.ListenAndServe()
-        if err != nil && err != http.ErrServerClosed {
-            log.Fatalf("Server failed: %v", err)
-        }
-    }()
+	go func() {
+		log.Printf("Nukoto server starting on port %s...", server.Addr[1:])
+		err := server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server failed: %v", err)
+		}
+	}()
 
-    stop := make(chan os.Signal, 1)
-    signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 
-    <-stop
+	<-stop
 
-    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-    defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-    err := server.Shutdown(ctx)
-    if err != nil {
-        log.Fatalf("Server forced to shutdown: %v", err)
-    }
+	err := server.Shutdown(ctx)
+	if err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
 }
