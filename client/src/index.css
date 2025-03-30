@@ -1,31 +1,53 @@
 @import "tailwindcss";
 
 @font-face {
-	font-family: Kodenmachou;
-	src: url("./assets/font/KH-Dot-Kodenmachou-12.ttf");
+    font-family: Kodenmachou;
+    src: url("./assets/font/KH-Dot-Kodenmachou-12.ttf");
 }
 
 @theme {
-	--font-koden: "Kodenmachou", "sans-serif";
-	--color-lavender: #b4befe;
-	--color-mauve: #cba6f7;
-	--color-error: #f38ba8;
-	--color-text: #cdd6f4;
-	--color-base: #1e1e2e;
-	--color-mantle: #181825;
-	--color-crust: #11111b;
-	--color-subtext0: #a6adc8;
-	--color-subtext1: #bac2de;
-	--color-surface0: #313244;
-	--color-surface1: #45475a;
-	--color-surface2: #585b70;
-	--color-overlay0: #6c7086;
-	--color-overlay1: #7f849c;
-	--color-overlay2: #9399b2;
+    --font-koden: "Kodenmachou", "sans-serif";
+    --color-lavender: #b4befe;
+    --color-mauve: #cba6f7;
+    --color-error: #f38ba8;
+    --color-text: #cdd6f4;
+    --color-base: #1e1e2e;
+    --color-mantle: #181825;
+    --color-crust: #11111b;
+    --color-subtext0: #a6adc8;
+    --color-subtext1: #bac2de;
+    --color-surface0: #313244;
+    --color-surface1: #45475a;
+    --color-surface2: #585b70;
+    --color-overlay0: #6c7086;
+    --color-overlay1: #7f849c;
+    --color-overlay2: #9399b2;
 }
 
 @layer base {
-	html {
-		background-color: #1e1e2e;
-	}
+    html {
+        background-color: #1e1e2e;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-overlay0);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-overlay1);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-overlay0) transparent;
 }
