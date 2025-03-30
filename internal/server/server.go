@@ -62,7 +62,7 @@ func (rl *RateLimiter) isAllowed(ip string) bool {
 		rl.requests[ip] = valid
 	}
 
-	if len(rl.requests[ip]) >= 5 {
+	if len(rl.requests[ip]) >= 100 {
 		return false
 	}
 
