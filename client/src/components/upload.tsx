@@ -40,7 +40,7 @@ function Upload() {
             "image/webp": [".webp"],
         },
         multiple: true,
-        maxSize: 5 * 1024 * 1024,
+        maxSize: 20 * 1024 * 1024,
         maxFiles: 30,
     });
 

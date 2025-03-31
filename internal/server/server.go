@@ -31,7 +31,7 @@ type ImageResponse struct {
 }
 
 const (
-	maxFileSize = 50 << 20
+	maxFileSize = 20 << 20
 	maxMemory   = 10 << 20
 	maxFiles    = 30
 )
