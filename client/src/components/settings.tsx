@@ -16,12 +16,12 @@ function Settings() {
 	};
 
 	return (
-		<div className="w-full font-koden text-text sm:h-[360px] h-[280px] flex flex-col bg-surface0 outline-1 outline-surface1 rounded-sm">
-			<h1 className="text-2xl mb-4 ml-3.5 mt-3 text-lavender">Settings</h1>
+		<div className="w-full font-koden text-mochatext sm:h-[360px] h-[280px] flex flex-col bg-mochasurface0 outline-1 outline-mochasurface1 rounded-sm">
+			<h1 className="text-2xl mb-4 ml-3.5 mt-3 text-mochalavender">Settings</h1>
 			<div className="w-full flex flex-col -mt-2">
 				<div className="flex justify-between items-center w-11/12 mx-auto">
 					<label className="text-xl">Quality</label>
-					<span className="text-lg text-mauve">{currentQuality}</span>
+					<span className="text-lg text-mochapink">{currentQuality}</span>
 				</div>
 				<div className="w-11/12 mx-auto">
 					<input
@@ -31,9 +31,9 @@ function Settings() {
 						step="1"
 						value={currentQuality}
 						onChange={handleQuality}
-						className="w-full h-2 focus:outline-none bg-surface1 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-mauve"
+						className="w-full h-2 focus:outline-none bg-mochasurface1 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-mochamauve"
 					/>
-					<span className="text-xs text-subtext0">
+					<span className="text-xs text-mochasubtext0">
 						Higher values may result in large file sizes
 					</span>
 				</div>
@@ -42,7 +42,7 @@ function Settings() {
 					<div className="relative mt-2">
 						<select
 							onChange={handleFormat}
-							className="w-full cursor-pointer focus:outline-none h-8 bg-surface1 text-text text-md rounded-md appearance-none pl-2 pr-8"
+							className="w-full cursor-pointer focus:outline-none h-8 bg-mochasurface1 text-mochapink text-lg rounded-md appearance-none pl-2 pr-8 hover:bg-mochasurface2"
 						>
 							<option>PNG</option>
 							<option>JPG</option>
@@ -61,11 +61,11 @@ function Settings() {
 						type="checkbox"
 						id="compress"
 						disabled={true}
-						className="w-4 h-4 cursor-pointer accent-mauve focus:outline-none bg-surface1 rounded"
+						className="w-4 h-4 cursor-pointer accent-mochamauve focus:outline-none bg-mochasurface1 rounded"
 					/>
 					<label htmlFor="compress" className="text-xl ml-2 cursor-pointer">
 						Compress
-						<span className="text-sm ml-2 text-subtext0">coming soon</span>
+						<span className="text-sm ml-2 text-mochasubtext0">coming soon</span>
 					</label>
 				</div>
 			</div>

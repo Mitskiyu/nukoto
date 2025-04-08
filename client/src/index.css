@@ -7,26 +7,37 @@
 
 @theme {
     --font-koden: "Kodenmachou", "sans-serif";
-    --color-lavender: #b4befe;
-    --color-mauve: #cba6f7;
-    --color-error: #f38ba8;
-    --color-text: #cdd6f4;
-    --color-base: #1e1e2e;
-    --color-mantle: #181825;
-    --color-crust: #11111b;
-    --color-subtext0: #a6adc8;
-    --color-subtext1: #bac2de;
-    --color-surface0: #313244;
-    --color-surface1: #45475a;
-    --color-surface2: #585b70;
-    --color-overlay0: #6c7086;
-    --color-overlay1: #7f849c;
-    --color-overlay2: #9399b2;
+    --color-mocharosewater: #f5e0dc;
+    --color-mochaflamingo: #f2cdcd;
+    --color-mochapink: #f5c2e7;
+    --color-mochamauve: #cba6f7;
+    --color-mochared: #f38ba8;
+    --color-mochamaroon: #eba0ac;
+    --color-mochapeach: #fab387;
+    --color-mochayellow: #f9e2af;
+    --color-mochagreen: #a6e3a1;
+    --color-mochateal: #94e2d5;
+    --color-mochasky: #89dceb;
+    --color-mochasapphire: #74c7ec;
+    --color-mochablue: #89b4fa;
+    --color-mochalavender: #b4befe;
+    --color-mochatext: #cdd6f4;
+    --color-mochasubtext0: #a6adc8;
+    --color-mochasubtext1: #bac2de;
+    --color-mochasurface0: #313244;
+    --color-mochasurface1: #45475a;
+    --color-mochasurface2: #585b70;
+    --color-mochaoverlay0: #6c7086;
+    --color-mochaoverlay1: #7f849c;
+    --color-mochaoverlay2: #9399b2;
+    --color-mochabase: #1e1e2e;
+    --color-mochamantle: #181825;
+    --color-mochacrust: #11111b;
 }
 
 @layer base {
     html {
-        background-color: #1e1e2e;
+        background-color: var(--color-mochabase);
     }
 }
 
@@ -39,15 +50,15 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: var(--color-overlay0);
+    background-color: var(--color-mochaoverlay0);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-overlay1);
+    background-color: var(--color-mochaoverlay1);
 }
 
 * {
     scrollbar-width: thin;
-    scrollbar-color: var(--color-overlay0) transparent;
+    scrollbar-color: var(--color-mochaoverlay0) transparent;
 }

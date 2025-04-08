@@ -45,17 +45,17 @@ function Upload() {
     });
 
     return (
-        <div className="w-full h-[256px] bg-surface0 outline-1 outline-surface1 rounded-sm flex flex-col font-koden">
-            <h2 className="text-2xl text-lavender ml-3.5 mt-3">Upload Image</h2>
+        <div className="w-full h-[256px] bg-mochasurface0 outline-1 outline-mochasurface1 rounded-sm flex flex-col font-koden">
+            <h2 className="text-2xl text-mochalavender ml-3.5 mt-3">Upload Image</h2>
             <div className="flex flex-1 items-center justify-center">
                 <div {...getRootProps()}
-                    className="w-11/12 h-10/12 flex flex-col bg-transparent outline-2 outline-dashed outline-overlay0 cursor-pointer hover:outline-mauve rounded-sm items-center justify-center">
+                    className="w-11/12 h-10/12 flex flex-col bg-transparent outline-2 outline-dashed outline-mochaoverlay0 cursor-pointer hover:outline-mochamauve hover:text-mochamauve rounded-sm items-center justify-center transition-colors duration-200">
                     <input {...getInputProps()} />
                     <img className="h-12 w-12 mt-8" src={nukoPeek} alt="nuko cat peek envelope" />
-                    <p className="text-text text-md">
+                    <p className="text-mochatext text-md">
                         Click to select or drag images here
                     </p>
-                    <p className="text-subtext0 text-sm mt-2">
+                    <p className="text-mochasubtext0 text-sm mt-2">
                         Supports PNG, JPG, WEBP, AVIF.
                     </p>
                 </div>
